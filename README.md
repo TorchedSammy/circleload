@@ -1,8 +1,19 @@
 # Circleload
-Circleload is a command line tool to easily download beatmaps
+> 📩 Command line osu! beatmap downloader
 
-Work in progress!
+Circleload is a command line tool to easily download osu! beatmaps.
+# Install
+```
+go install github.com/TorchedSammy/Circleload@latest
+```
 
+# Usage
+Run the `Circleload` binary, providing mapset ID(s):
+```
+Circleload 1077483
+```
+
+Use `Circleload -h` to see command line flags.
 # License
 MIT
 
