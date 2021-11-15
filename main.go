@@ -49,6 +49,15 @@ func downloadMapset(mapsetID int, name string) {
 		panic(err)
 	}
 
+	if resp.StatusCode != 200 {
+		fmt.Printf("Failed to download %s with response code %s\n", name, resp.Status)
+		// print the response body
+		io.Copy(os.Stderr, resp.Body)
+		fmt.Printf("\n")
+		resp.Body.Close()
+		return
+	}
+
 	// write body to file
 	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, name))
 	if err != nil {
@@ -57,5 +66,6 @@ func downloadMapset(mapsetID int, name string) {
 	defer file.Close()
 
 	io.Copy(file, resp.Body)
+	resp.Body.Close()
 }
 
