@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +15,12 @@ var (
 	outDir string
 )
 
+type osuMapSet struct {
+	SetID   int
+	Artist string
+	Title string
+}
+
 func main() {
 	flag.StringVarP(&outDir, "outputDir", "o", "~/Downloads", "Directory Circeload will download maps into")
 	flag.Parse()
@@ -22,20 +29,27 @@ func main() {
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
 			fmt.Println("Invalid mapset ID:", v)
+			continue
 		}
-		downloadMapset(idInt)
+
+		resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/api/s/%d", idInt))
+		var set osuMapSet
+		json.NewDecoder(resp.Body).Decode(&set)
+
+		name := fmt.Sprintf("%d %s - %s", idInt, set.Artist, set.Title)
+		fmt.Printf("Downloading %s\n", name)
+		downloadMapset(idInt, name)
 	}
 }
 
-func downloadMapset(mapsetID int) {
+func downloadMapset(mapsetID int, name string) {
 	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/d/%d", mapsetID))
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(resp.Status)
 	// write body to file
-	file, err := os.Create(fmt.Sprintf("%s/%d.osz", outDir, mapsetID))
+	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, name))
 	if err != nil {
 		panic(err)
 	}
@@ -43,3 +57,4 @@ func downloadMapset(mapsetID int) {
 
 	io.Copy(file, resp.Body)
 }
+
