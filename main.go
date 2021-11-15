@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	flag "github.com/spf13/pflag"
 )
@@ -36,7 +37,7 @@ func main() {
 		var set osuMapSet
 		json.NewDecoder(resp.Body).Decode(&set)
 
-		name := fmt.Sprintf("%d %s - %s", idInt, set.Artist, set.Title)
+		name := strings.Replace(fmt.Sprintf("%d %s - %s", idInt, set.Artist, set.Title), "/", "", -1)
 		fmt.Printf("Downloading %s\n", name)
 		downloadMapset(idInt, name)
 	}
