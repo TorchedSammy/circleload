@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -14,9 +12,11 @@ import (
 
 var (
 	outDir string
+	mirrorName string
+	mirrorFallback bool
 )
 
-type osuMapSet struct {
+type osuMapset struct {
 	SetID   int
 	Artist string
 	Title string
@@ -24,48 +24,126 @@ type osuMapSet struct {
 
 func main() {
 	flag.StringVarP(&outDir, "outputDir", "o", "~/Downloads", "Directory Circeload will download maps into")
+	flag.StringVarP(&mirrorName, "mirror", "m", "kitsu", "Mirror to download from (kitsu or chimu)")
+	flag.BoolVarP(&mirrorFallback, "fallback", "f", false, "Fallback to other mirrors if main mirror fails")
 	flag.Parse()
 
+	if len(flag.Args()) == 0 {
+		fmt.Println("Usage: Circeload [flags] <mapset> [mapset] ...")
+		//not implemented
+		//fmt.Println("mapset can be the url or just the id")
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	mirror := getMirror(mirrorName)
+	if mirror == nil {
+		fmt.Println("Invalid mirror", mirrorName)
+		fmt.Println("Valid mirrors are: kitsu, chimu")
+		os.Exit(1)
+	}
+
+	mirrors := []string{"kitsu", "chimu"}
+	// remove mirror we are using from list
+	for i, m := range mirrors {
+		if m == mirrorName {
+			mirrors = append(mirrors[:i], mirrors[i + 1:]...)
+			break
+		}
+	}
+
 	for _, v := range flag.Args() {
+	start:
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
 			fmt.Println("Invalid mapset ID:", v)
 			continue
 		}
 
-		resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/api/s/%d", idInt))
-		var set osuMapSet
-		json.NewDecoder(resp.Body).Decode(&set)
-
+		set, err := mirror.GetMapset(idInt)
+		if err != nil {
+			fmt.Println("Error getting mapset:", err)
+			if mirrorFallback == true {
+				// if no other mirrors, exit
+				if len(mirrors) == 0 {
+					fmt.Println("All mirrors tried, exiting..")
+					os.Exit(1)
+				}
+				fmt.Println("Falling back to other mirror")
+				mirror = getMirror(mirrors[0])
+				// remove mirror we are using from list
+				for i, m := range mirrors {
+					if m == mirrors[0] {
+						mirrors = append(mirrors[:i], mirrors[i + 1:]...)
+						break
+					}
+				}
+				goto start
+			} else {
+				continue
+			}
+		}
 		name := strings.Replace(fmt.Sprintf("%d %s - %s", idInt, set.Artist, set.Title), "/", "", -1)
 		fmt.Printf("Downloading %s\n", name)
-		downloadMapset(idInt, name)
+		err = downloadMapset(idInt, name, mirror)
+		if err != nil {
+			// i dont really like the repeating code here but i dont know how to do it better
+			fmt.Println("Error downloading mapset:", err)
+			if mirrorFallback == true {
+				// if no other mirrors, exit
+				if len(mirrors) == 0 {
+					fmt.Println("All mirrors tried, exiting..")
+					os.Exit(1)
+				}
+				fmt.Println("Falling back to chimu")
+				mirror = getMirror(mirrors[0])
+				// remove mirror we are using from list
+				for i, m := range mirrors {
+					if m == mirrors[0] {
+						mirrors = append(mirrors[:i], mirrors[i + 1:]...)
+						break
+					}
+				}
+				goto start
+			} else {
+				continue
+			}
+		}
 	}
 }
 
-func downloadMapset(mapsetID int, name string) {
-	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/d/%d", mapsetID))
+func downloadMapset(mapsetID int, name string, mirror mapsetMirror) error {
+	mapset, err := mirror.GetMapsetData(mapsetID)
 	if err != nil {
-		panic(err)
-	}
-
-	if resp.StatusCode != 200 {
-		fmt.Printf("Failed to download %s with response code %s\n", name, resp.Status)
-		// print the response body
-		io.Copy(os.Stderr, resp.Body)
-		fmt.Printf("\n")
-		resp.Body.Close()
-		return
+		return err
 	}
 
 	// write body to file
 	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, name))
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer file.Close()
 
-	io.Copy(file, resp.Body)
-	resp.Body.Close()
+	// mapset is a ReadCloser
+	io.Copy(file, mapset)
+	mapset.Close()
+	return nil
+}
+
+func getMirror(name string) mapsetMirror {
+	switch name {
+	case "kitsu":
+		return kitsuMirror{}
+	case "chimu":
+		return chimuMirror{}
+	// perhaps in the future, copilot
+	/*
+	case "osu":
+		return osuMirror{}
+	*/
+	}
+
+	return nil
 }
 
