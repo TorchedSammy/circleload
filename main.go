@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -23,7 +24,8 @@ type osuMapset struct {
 }
 
 func main() {
-	flag.StringVarP(&outDir, "outputDir", "o", "~/Downloads", "Directory Circeload will download maps into")
+	homedir, _ := os.UserHomeDir()
+	flag.StringVarP(&outDir, "outputDir", "o", filepath.Join(homedir, "Downloads"), "Directory Circeload will download maps into")
 	flag.StringVarP(&mirrorName, "mirror", "m", "kitsu", "Mirror to download from (kitsu or chimu)")
 	flag.BoolVarP(&mirrorFallback, "fallback", "f", false, "Fallback to other mirrors if main mirror fails")
 	flag.Parse()
