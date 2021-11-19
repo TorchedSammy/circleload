@@ -15,6 +15,11 @@ type chimuResponse struct {
 	Data osuMapset
 }
 
+type chimuSearchResponse struct {
+	chimuResponse
+	Data []osuMapset
+}
+
 func (k chimuMirror) GetMapset(id int) (osuMapset, error) {
 	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/set/%d", id))
 	if err != nil {
@@ -30,6 +35,19 @@ func (k chimuMirror) GetMapset(id int) (osuMapset, error) {
 	set := apiResp.Data
 
 	return set, nil
+}
+
+func (k chimuMirror) Search(query string) ([]osuMapset, error) {
+	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/search?query=%s&amount=5", query))
+	if err != nil {
+		return nil, err
+	}
+
+	var apiResp chimuSearchResponse
+	json.NewDecoder(resp.Body).Decode(&apiResp)
+	sets := apiResp.Data
+
+	return sets, nil
 }
 
 func (k chimuMirror) GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, error) {

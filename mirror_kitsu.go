@@ -53,6 +53,27 @@ func (k kitsuMirror) GetMapset(id int) (osuMapset, error) {
 	return set, nil
 }
 
+// thanks copilot
+func (k kitsuMirror) Search(query string) ([]osuMapset, error) {
+	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/api/search/?query=%s&amount=5", query))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var sets []osuMapset
+	err = json.Unmarshal(body, &sets)
+	if err != nil {
+		return nil, err
+	}
+
+	return sets, nil
+}
+
 // get beatmap from kitsu
 func (k kitsuMirror) GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, error) {
 	// kitsu doesnt have a noVideo option

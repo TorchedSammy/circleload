@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	flag "github.com/spf13/pflag"
+	"github.com/manifoldco/promptui"
 )
 
 var (
@@ -22,6 +23,7 @@ type osuMapset struct {
 	SetID   int
 	Artist string
 	Title string
+	Mapper string `json:"Creator"`
 }
 
 func main() {
@@ -62,13 +64,38 @@ func main() {
 
 	for _, v := range flag.Args() {
 	start:
+		var set osuMapset
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
-			fmt.Println("Invalid mapset ID:", v)
-			continue
+			// will assume its a search query
+			info(fmt.Sprintf("Searching for query \"%s\"", v))
+			sets, _ := mirror.Search(v)
+			if len(sets) == 0 {
+				logerror("No results found.")
+				continue
+			}
+			setTiles := make([]string, len(sets))
+			for i, s := range sets {
+				// title - artist by mapper
+				setTiles[i] = fmt.Sprintf("%s - %s by %s", s.Title, s.Artist, s.Mapper)
+			}
+
+			prompt := promptui.Select{
+				Label: "Select a mapset",
+				Items: setTiles,
+			}
+
+			idx, _, err := prompt.Run()
+			if err != nil {
+				fmt.Println("Aborting search...")
+				continue
+			}
+
+			set = sets[idx]
+			goto download
 		}
 
-		set, err := mirror.GetMapset(idInt)
+		set, err = mirror.GetMapset(idInt)
 		if err != nil {
 			fmt.Println("Error getting mapset:", err)
 			if mirrorFallback {
@@ -91,8 +118,9 @@ func main() {
 				continue
 			}
 		}
-		name := strings.Replace(fmt.Sprintf("%d %s - %s", idInt, set.Artist, set.Title), "/", "", -1)
-		err = downloadMapset(idInt, name, mirror, mirrorOpts)
+	download:
+		name := strings.Replace(fmt.Sprintf("%d %s - %s", set.SetID, set.Artist, set.Title), "/", "", -1)
+		err = downloadMapset(set.SetID, name, mirror, mirrorOpts)
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
 			fmt.Println("Error downloading mapset:", err)

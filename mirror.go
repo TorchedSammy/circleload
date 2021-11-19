@@ -11,6 +11,7 @@ var (
 
 type mapsetMirror interface {
 	GetMapset(id int) (osuMapset, error)
+	Search(query string) ([]osuMapset, error)
 	GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, error)
 }
 
