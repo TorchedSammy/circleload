@@ -104,8 +104,8 @@ func main() {
 					fmt.Println("All mirrors tried, exiting..")
 					os.Exit(1)
 				}
-				fmt.Println("Falling back to other mirror")
 				mirror = getMirror(mirrors[0])
+				info("Falling back to " + mirrors[0])
 				// remove mirror we are using from list
 				for i, m := range mirrors {
 					if m == mirrors[0] {
@@ -123,14 +123,14 @@ func main() {
 		err = downloadMapset(set.SetID, name, mirror, mirrorOpts)
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
-			fmt.Println("Error downloading mapset:", err)
+			logerror(fmt.Sprint("Error downloading mapset:", err))
 			if mirrorFallback {
 				// if no other mirrors, exit
 				if len(mirrors) == 0 {
-					fmt.Println("All mirrors tried, exiting..")
+					logerror("All mirrors tried, exiting..")
 					os.Exit(1)
 				}
-				fmt.Println("Falling back to chimu")
+				info("Falling back to " + mirrors[0])
 				mirror = getMirror(mirrors[0])
 				// remove mirror we are using from list
 				for i, m := range mirrors {
@@ -153,7 +153,7 @@ func downloadMapset(mapsetID int, name string, mirror mapsetMirror, opts mirrorO
 		return err
 	}
 
-	fmt.Printf("Downloading %s\n", name)
+	info("Downloading" + name)
 
 	// write body to file
 	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, name))
