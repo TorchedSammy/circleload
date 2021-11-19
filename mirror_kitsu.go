@@ -54,7 +54,13 @@ func (k kitsuMirror) GetMapset(id int) (osuMapset, error) {
 }
 
 // get beatmap from kitsu
-func (k kitsuMirror) GetMapsetData(id int) (io.ReadCloser, error) {
+func (k kitsuMirror) GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, error) {
+	// kitsu doesnt have a noVideo option
+	// log that it doesnt
+	if opts.noVideo {
+		warn("kitsu mirror doesnt support noVideo")
+	}
+
 	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/d/%d", id))
 	if err != nil {
 		return nil, err

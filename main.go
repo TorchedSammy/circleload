@@ -15,6 +15,7 @@ var (
 	outDir string
 	mirrorName string
 	mirrorFallback bool
+	noVideo bool
 )
 
 type osuMapset struct {
@@ -28,6 +29,7 @@ func main() {
 	flag.StringVarP(&outDir, "downloadDir", "d", filepath.Join(homedir, "Downloads"), "Directory Circeload will download maps into")
 	flag.StringVarP(&mirrorName, "mirror", "m", "chimu", "Mirror to download from (kitsu or chimu)")
 	flag.BoolVarP(&mirrorFallback, "fallback", "f", false, "Fallback to other mirrors if main mirror fails")
+	flag.BoolVarP(&noVideo, "noVideo", "V", false, "Don't download map with video")
 	flag.Parse()
 
 	if len(flag.Args()) == 0 {
@@ -39,6 +41,10 @@ func main() {
 	}
 
 	mirror := getMirror(mirrorName)
+	mirrorOpts := mirrorOptions{
+		noVideo: noVideo,
+	}
+
 	if mirror == nil {
 		fmt.Println("Invalid mirror", mirrorName)
 		fmt.Println("Valid mirrors are: kitsu, chimu")
@@ -86,8 +92,7 @@ func main() {
 			}
 		}
 		name := strings.Replace(fmt.Sprintf("%d %s - %s", idInt, set.Artist, set.Title), "/", "", -1)
-		fmt.Printf("Downloading %s\n", name)
-		err = downloadMapset(idInt, name, mirror)
+		err = downloadMapset(idInt, name, mirror, mirrorOpts)
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
 			fmt.Println("Error downloading mapset:", err)
@@ -114,11 +119,13 @@ func main() {
 	}
 }
 
-func downloadMapset(mapsetID int, name string, mirror mapsetMirror) error {
-	mapset, err := mirror.GetMapsetData(mapsetID)
+func downloadMapset(mapsetID int, name string, mirror mapsetMirror, opts mirrorOptions) error {
+	mapset, err := mirror.GetMapsetData(mapsetID, opts)
 	if err != nil {
 		return err
 	}
+
+	fmt.Printf("Downloading %s\n", name)
 
 	// write body to file
 	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, name))

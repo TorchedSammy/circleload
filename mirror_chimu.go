@@ -32,8 +32,13 @@ func (k chimuMirror) GetMapset(id int) (osuMapset, error) {
 	return set, nil
 }
 
-func (k chimuMirror) GetMapsetData(id int) (io.ReadCloser, error) {
-	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/download/%d", id))
+func (k chimuMirror) GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, error) {
+	noVideo := 0
+	if opts.noVideo {
+		noVideo = 1
+	}
+
+	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/download/%d?n=%d", id, noVideo))
 	if err != nil {
 		return nil, err
 	}
