@@ -65,7 +65,7 @@ func main() {
 		set, err := mirror.GetMapset(idInt)
 		if err != nil {
 			fmt.Println("Error getting mapset:", err)
-			if mirrorFallback == true {
+			if mirrorFallback {
 				// if no other mirrors, exit
 				if len(mirrors) == 0 {
 					fmt.Println("All mirrors tried, exiting..")
@@ -91,7 +91,7 @@ func main() {
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
 			fmt.Println("Error downloading mapset:", err)
-			if mirrorFallback == true {
+			if mirrorFallback {
 				// if no other mirrors, exit
 				if len(mirrors) == 0 {
 					fmt.Println("All mirrors tried, exiting..")
