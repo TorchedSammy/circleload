@@ -153,7 +153,7 @@ func downloadMapset(mapsetID int, name string, mirror mapsetMirror, opts mirrorO
 		return err
 	}
 
-	info("Downloading" + name)
+	info("Downloading " + name)
 
 	// write body to file
 	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, name))
