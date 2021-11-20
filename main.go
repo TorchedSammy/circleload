@@ -19,7 +19,10 @@ var (
 	mirrorName string
 	mirrorFallback bool
 	noVideo bool
+	versionFlag bool
 )
+
+const version = "0.2.0"
 
 type osuMapset struct {
 	SetID   int
@@ -34,7 +37,13 @@ func main() {
 	flag.StringVarP(&mirrorName, "mirror", "m", "chimu", "Mirror to download from (kitsu or chimu)")
 	flag.BoolVarP(&mirrorFallback, "fallback", "f", false, "Fallback to other mirrors if main mirror fails")
 	flag.BoolVarP(&noVideo, "noVideo", "V", false, "Don't download map with video")
+	flag.BoolVarP(&versionFlag, "version", "v", false, "Print version and exit")
 	flag.Parse()
+
+	if versionFlag {
+		fmt.Println("Circleload v" + version)
+		return
+	}
 
 	if len(flag.Args()) == 0 {
 		fmt.Println("Usage: Circeload [flags] <mapset> [mapset] ...")
