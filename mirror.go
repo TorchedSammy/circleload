@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"io"
+	"net/http"
 )
 
 var (
@@ -12,7 +12,7 @@ var (
 type mapsetMirror interface {
 	GetMapset(id int) (osuMapset, error)
 	Search(query string) ([]osuMapset, error)
-	GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, error)
+	GetMapsetData(id int, opts mirrorOptions) (*http.Response, error)
 }
 
 type mirrorOptions struct {

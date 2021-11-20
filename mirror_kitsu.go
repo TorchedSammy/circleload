@@ -75,7 +75,7 @@ func (k kitsuMirror) Search(query string) ([]osuMapset, error) {
 }
 
 // get beatmap from kitsu
-func (k kitsuMirror) GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, error) {
+func (k kitsuMirror) GetMapsetData(id int, opts mirrorOptions) (*http.Response, error) {
 	// kitsu doesnt have a noVideo option
 	// log that it doesnt
 	if opts.noVideo {
@@ -91,6 +91,6 @@ func (k kitsuMirror) GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, e
 		return nil, ErrMapsetNotFound
 	}
 
-	return resp.Body, nil
+	return resp, nil
 }
 

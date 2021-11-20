@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -50,7 +49,7 @@ func (k chimuMirror) Search(query string) ([]osuMapset, error) {
 	return sets, nil
 }
 
-func (k chimuMirror) GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, error) {
+func (k chimuMirror) GetMapsetData(id int, opts mirrorOptions) (*http.Response, error) {
 	noVideo := 0
 	if opts.noVideo {
 		noVideo = 1
@@ -65,5 +64,5 @@ func (k chimuMirror) GetMapsetData(id int, opts mirrorOptions) (io.ReadCloser, e
 		return nil, ErrMapsetNotFound
 	}
 
-	return resp.Body, nil
+	return resp, nil
 }

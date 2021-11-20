@@ -9,8 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/manifoldco/promptui"
 	flag "github.com/spf13/pflag"
+	"github.com/manifoldco/promptui"
+	"github.com/cheggaaa/pb"
 )
 
 var (
@@ -150,7 +151,7 @@ func main() {
 }
 
 func downloadMapset(mapsetID int, name string, mirror mapsetMirror, opts mirrorOptions) error {
-	mapset, err := mirror.GetMapsetData(mapsetID, opts)
+	mapsetResp, err := mirror.GetMapsetData(mapsetID, opts)
 	if err != nil {
 		return err
 	}
@@ -164,9 +165,19 @@ func downloadMapset(mapsetID int, name string, mirror mapsetMirror, opts mirrorO
 	}
 	defer file.Close()
 
+	contentLength := mapsetResp.ContentLength
+	bar := pb.New64(contentLength)
+	bar.SetUnits(pb.U_BYTES)
+	bar.ShowSpeed = true
+	bar.ShowTimeLeft = true
+	barWriter := bar.NewProxyReader(mapsetResp.Body)
+
+	bar.Start()
 	// mapset is a ReadCloser
-	io.Copy(file, mapset)
-	mapset.Close()
+	io.Copy(file, barWriter)
+	mapsetResp.Body.Close()
+	bar.Finish()
+
 	return nil
 }
 
