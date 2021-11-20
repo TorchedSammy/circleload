@@ -9,7 +9,7 @@ https://user-images.githubusercontent.com/38820196/142741654-67cc917a-ef51-4032-
 ## Install
 ### Prebuilt Binaries
 See the [latest release](https://github.com/TorchedSammy/Circleload/releases/latest).
-`amd64` is for 64 bit and `386` is 32 bit. `arm64` is for 64bit ARM like the M1.
+`amd64` is for 64bit and `386` is 32bit. `arm64` is for 64bit ARM like the M1.
 
 ### Manual build
 For users with Go installed (minimum version 1.17):  
