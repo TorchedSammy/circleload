@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
-	flag "github.com/spf13/pflag"
 	"github.com/manifoldco/promptui"
+	flag "github.com/spf13/pflag"
 )
 
 var (
@@ -68,8 +69,9 @@ func main() {
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
 			// will assume its a search query
+			escapedSearch := url.PathEscape(v)
 			info(fmt.Sprintf("Searching for query \"%s\"", v))
-			sets, _ := mirror.Search(v)
+			sets, _ := mirror.Search(escapedSearch)
 			if len(sets) == 0 {
 				logerror("No results found.")
 				continue
