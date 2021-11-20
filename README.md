@@ -4,7 +4,7 @@
 Circleload is a command line tool to easily download osu! beatmaps.  
 It is a work in progress! There are some things that aren't handled properly.
 
-https://raw.githubusercontent.com/TorchedSammy/Circleload/master/showcas
+https://raw.githubusercontent.com/TorchedSammy/Circleload/master/showcase.mp4
 
 ## Install
 For users with Go installed (minimum version 1.17):
