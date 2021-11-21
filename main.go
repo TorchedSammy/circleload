@@ -20,6 +20,7 @@ var (
 	mirrorFallback bool
 	noVideo bool
 	versionFlag bool
+	mirrorListFlag bool
 )
 
 const version = "0.2.0"
@@ -38,10 +39,17 @@ func main() {
 	flag.BoolVarP(&mirrorFallback, "fallback", "f", false, "Fallback to other mirrors if main mirror fails")
 	flag.BoolVarP(&noVideo, "noVideo", "V", false, "Don't download map with video")
 	flag.BoolVarP(&versionFlag, "version", "v", false, "Print version and exit")
+	flag.BoolVarP(&mirrorListFlag, "mirrorList", "L", false, "List available mirrors and exit")
 	flag.Parse()
 
 	if versionFlag {
 		fmt.Println("Circleload v" + version)
+		return
+	}
+
+	mirrors := []string{"kitsu", "chimu"}
+	if mirrorListFlag {
+		fmt.Println("Available mirrors:", strings.Join(mirrors, ", "))
 		return
 	}
 
@@ -60,11 +68,10 @@ func main() {
 
 	if mirror == nil {
 		fmt.Println("Invalid mirror", mirrorName)
-		fmt.Println("Valid mirrors are: kitsu, chimu")
+		fmt.Println("Valid mirrors are:", strings.Join(mirrors, ", "))
 		os.Exit(1)
 	}
 
-	mirrors := []string{"kitsu", "chimu"}
 	// remove mirror we are using from list
 	for i, m := range mirrors {
 		if m == mirrorName {
