@@ -55,7 +55,7 @@ func (k kitsuMirror) GetMapset(id int) (osuMapset, error) {
 
 // thanks copilot
 func (k kitsuMirror) Search(query string) ([]osuMapset, error) {
-	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/api/search/?query=%s&amount=5", query))
+	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/api/search?query=%s&amount=5", query))
 	if err != nil {
 		return nil, err
 	}
