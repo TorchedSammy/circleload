@@ -61,10 +61,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	mirror := getMirror(mirrorName)
 	mirrorOpts := mirrorOptions{
 		noVideo: noVideo,
 	}
+	mirror := getMirror(mirrorName, mirrorOpts)
 
 	if mirror == nil {
 		fmt.Println("Invalid mirror", mirrorName)
@@ -123,7 +123,7 @@ func main() {
 					fmt.Println("All mirrors tried, exiting..")
 					os.Exit(1)
 				}
-				mirror = getMirror(mirrors[0])
+				mirror = getMirror(mirrors[0], mirrorOpts)
 				info("Falling back to " + mirrors[0])
 				// remove mirror we are using from list
 				for i, m := range mirrors {
@@ -139,7 +139,7 @@ func main() {
 		}
 	download:
 		name := strings.Replace(fmt.Sprintf("%d %s - %s", set.SetID, set.Artist, set.Title), "/", "", -1)
-		err = downloadMapset(set.SetID, name, mirror, mirrorOpts)
+		err = downloadMapset(set.SetID, name, mirror)
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
 			logerror(fmt.Sprint("Error downloading mapset:", err))
@@ -150,7 +150,7 @@ func main() {
 					os.Exit(1)
 				}
 				info("Falling back to " + mirrors[0])
-				mirror = getMirror(mirrors[0])
+				mirror = getMirror(mirrors[0], mirrorOpts)
 				// remove mirror we are using from list
 				for i, m := range mirrors {
 					if m == mirrors[0] {
@@ -166,8 +166,8 @@ func main() {
 	}
 }
 
-func downloadMapset(mapsetID int, name string, mirror mapsetMirror, opts mirrorOptions) error {
-	mapsetResp, err := mirror.GetMapsetData(mapsetID, opts)
+func downloadMapset(mapsetID int, name string, mirror mapsetMirror) error {
+	mapsetResp, err := mirror.GetMapsetData(mapsetID)
 	if err != nil {
 		return err
 	}
@@ -197,12 +197,12 @@ func downloadMapset(mapsetID int, name string, mirror mapsetMirror, opts mirrorO
 	return nil
 }
 
-func getMirror(name string) mapsetMirror {
+func getMirror(name string, opts mirrorOptions) mapsetMirror {
 	switch name {
 	case "kitsu":
-		return kitsuMirror{}
+		return kitsuMirror{opts: opts}
 	case "chimu":
-		return chimuMirror{}
+		return chimuMirror{opts: opts}
 	// perhaps in the future, copilot
 	/*
 	case "osu":

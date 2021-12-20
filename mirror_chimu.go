@@ -6,7 +6,9 @@ import (
 	"net/http"
 )
 
-type chimuMirror struct{}
+type chimuMirror struct{
+	opts mirrorOptions
+}
 
 type chimuResponse struct {
 	Code int
@@ -49,9 +51,9 @@ func (k chimuMirror) Search(query string) ([]osuMapset, error) {
 	return sets, nil
 }
 
-func (k chimuMirror) GetMapsetData(id int, opts mirrorOptions) (*http.Response, error) {
+func (k chimuMirror) GetMapsetData(id int) (*http.Response, error) {
 	noVideo := 0
-	if opts.noVideo {
+	if k.opts.noVideo {
 		noVideo = 1
 	}
 

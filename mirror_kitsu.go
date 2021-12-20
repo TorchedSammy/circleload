@@ -8,7 +8,9 @@ import (
 	"net/http"
 )
 
-type kitsuMirror struct {}
+type kitsuMirror struct {
+	opts mirrorOptions
+}
 
 // kitsu is NOT a proper restful api
 // on success, it doesnt send code
@@ -75,10 +77,10 @@ func (k kitsuMirror) Search(query string) ([]osuMapset, error) {
 }
 
 // get beatmap from kitsu
-func (k kitsuMirror) GetMapsetData(id int, opts mirrorOptions) (*http.Response, error) {
+func (k kitsuMirror) GetMapsetData(id int) (*http.Response, error) {
 	// kitsu doesnt have a noVideo option
 	// log that it doesnt
-	if opts.noVideo {
+	if k.opts.noVideo {
 		warn("kitsu mirror doesnt support noVideo")
 	}
 
