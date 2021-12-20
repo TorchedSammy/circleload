@@ -21,6 +21,7 @@ var (
 	noVideo bool
 	versionFlag bool
 	mirrorListFlag bool
+	maxResults int
 )
 
 const version = "0.2.0"
@@ -40,6 +41,8 @@ func main() {
 	flag.BoolVarP(&noVideo, "noVideo", "V", false, "Don't download map with video")
 	flag.BoolVarP(&versionFlag, "version", "v", false, "Print version and exit")
 	flag.BoolVarP(&mirrorListFlag, "mirrorList", "L", false, "List available mirrors and exit")
+	flag.IntVarP(&maxResults, "max-results", "r", 10, "Amount of mapsets to return from a search")
+
 	flag.Parse()
 
 	if versionFlag {
@@ -61,8 +64,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	if maxResults < 2 && maxResults > 100 {
+		logerror("Search amount must be between 2 and 100.")
+		os.Exit(1)
+	}
+
 	mirrorOpts := mirrorOptions{
 		noVideo: noVideo,
+		maxResults: maxResults,
 	}
 	mirror := getMirror(mirrorName, mirrorOpts)
 

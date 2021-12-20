@@ -39,7 +39,7 @@ func (k chimuMirror) GetMapset(id int) (osuMapset, error) {
 }
 
 func (k chimuMirror) Search(query string) ([]osuMapset, error) {
-	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/search?query=%s&amount=5", query))
+	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/search?query=%s&amount=%d", query, k.opts.maxResults))
 	if err != nil {
 		return nil, err
 	}

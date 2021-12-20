@@ -17,6 +17,6 @@ type mapsetMirror interface {
 
 type mirrorOptions struct {
 	noVideo bool
-	searchAmount int
+	maxResults int
 }
 
