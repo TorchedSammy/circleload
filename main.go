@@ -41,7 +41,7 @@ func main() {
 	flag.BoolVarP(&noVideo, "noVideo", "V", false, "Don't download map with video")
 	flag.BoolVarP(&versionFlag, "version", "v", false, "Print version and exit")
 	flag.BoolVarP(&mirrorListFlag, "mirrorList", "L", false, "List available mirrors and exit")
-	flag.IntVarP(&maxResults, "max-results", "r", 10, "Amount of mapsets to return from a search")
+	flag.IntVarP(&maxResults, "max-results", "r", 5, "Amount of mapsets to return from a search")
 
 	flag.Parse()
 
