@@ -94,7 +94,44 @@ func main() {
 		var set osuMapset
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
-			// will assume its a search query
+			// will assume its a url
+			// try to parse it
+			u, err := url.ParseRequestURI(v)
+			if err == nil {
+				// check if it is a mapset url
+				if u.Host == "osu.ppy.sh" {
+					// we accept the path "beatmapsets/<id>" and "beatmaps/<id>"
+					// a beatmapset has just a mapset, where for beatmaps we need to get the mapset id
+					if strings.HasPrefix(u.Path, "/beatmapsets/") {
+						idInt, err = strconv.Atoi(u.Path[len("/beatmapsets/"):])
+						if err != nil {
+							logerror("Ignoring invalid mapset url: " + v)
+						}
+
+						set, err = mirror.GetMapset(idInt)
+						goto download
+					} else if strings.HasPrefix(u.Path, "/beatmaps/") {
+						idInt, err = strconv.Atoi(u.Path[len("/beatmaps/"):])
+						if err != nil {
+							logerror("Ignoring invalid mapset url: " + v)
+						}
+
+						mapset, err := mirror.GetMapsetFromMap(idInt)
+						if err != nil {
+							logerror(fmt.Sprintln("Could not get mapset from map:", err))
+						}
+						set = mapset
+						goto download
+					} else {
+						logerror("Invalid mapset url")
+						os.Exit(1)
+					}
+				} else {
+					logerror("Ignoring non-osu url: " + v)
+					continue
+				}
+			}
+
 			escapedSearch := url.PathEscape(v)
 			info(fmt.Sprintf("Searching for query \"%s\"", v))
 			sets, _ := mirror.Search(escapedSearch)
