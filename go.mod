@@ -1,4 +1,4 @@
-module github.com/TorchedSammy/Circleload
+module github.com/TorchedSammy/circleload
 
 go 1.17
 
