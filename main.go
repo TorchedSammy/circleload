@@ -38,7 +38,7 @@ func main() {
 	flag.StringVarP(&outDir, "downloadDir", "d", filepath.Join(homedir, "Downloads"), "Directory Circeload will download maps into")
 	flag.StringVarP(&mirrorName, "mirror", "m", "chimu", "Mirror to download from (kitsu or chimu)")
 	flag.BoolVarP(&mirrorFallback, "fallback", "f", true, "Fallback to other mirrors if main mirror fails")
-	flag.BoolVarP(&noVideo, "noVideo", "V", false, "Download mapset without video")
+	flag.BoolVarP(&noVideo, "no-video", "n", false, "Download mapset without video")
 	flag.BoolVarP(&versionFlag, "version", "v", false, "Print version and exit")
 	flag.BoolVarP(&mirrorListFlag, "mirrors", "M", false, "List available mirrors and exit")
 	flag.IntVarP(&maxResults, "max-results", "r", 5, "Amount of mapsets to return from a search")
