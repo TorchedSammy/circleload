@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	flag "github.com/spf13/pflag"
+	"github.com/TorchedSammy/circleload/log"
 	"github.com/manifoldco/promptui"
 	"github.com/cheggaaa/pb"
 )
@@ -65,7 +66,7 @@ func main() {
 	}
 
 	if maxResults < 2 && maxResults > 100 {
-		logerror("Search amount must be between 2 and 100.")
+		log.Error("Search amount must be between 2 and 100.")
 		os.Exit(1)
 	}
 
@@ -105,7 +106,7 @@ func main() {
 					if strings.HasPrefix(u.Path, "/beatmapsets/") {
 						idInt, err = strconv.Atoi(u.Path[len("/beatmapsets/"):])
 						if err != nil {
-							logerror("Ignoring invalid mapset url: " + v)
+							log.Error("Ignoring invalid mapset url: " + v)
 						}
 
 						set, err = mirror.GetMapset(idInt)
@@ -113,30 +114,30 @@ func main() {
 					} else if strings.HasPrefix(u.Path, "/beatmaps/") {
 						idInt, err = strconv.Atoi(u.Path[len("/beatmaps/"):])
 						if err != nil {
-							logerror("Ignoring invalid mapset url: " + v)
+							log.Error("Ignoring invalid mapset url: " + v)
 						}
 
 						mapset, err := mirror.GetMapsetFromMap(idInt)
 						if err != nil {
-							logerror(fmt.Sprintln("Could not get mapset from map:", err))
+							log.Error(fmt.Sprintln("Could not get mapset from map:", err))
 						}
 						set = mapset
 						goto download
 					} else {
-						logerror("Invalid mapset url")
+						log.Error("Invalid mapset url")
 						os.Exit(1)
 					}
 				} else {
-					logerror("Ignoring non-osu url: " + v)
+					log.Error("Ignoring non-osu url: " + v)
 					continue
 				}
 			}
 
 			escapedSearch := url.PathEscape(v)
-			info(fmt.Sprintf("Searching for query \"%s\"", v))
+			log.Info(fmt.Sprintf("Searching for query \"%s\"", v))
 			sets, _ := mirror.Search(escapedSearch)
 			if len(sets) == 0 {
-				logerror("No results found.")
+				log.Error("No results found.")
 				continue
 			}
 			setTiles := make([]string, len(sets))
@@ -170,7 +171,7 @@ func main() {
 					os.Exit(1)
 				}
 				mirror = getMirror(mirrors[0], mirrorOpts)
-				info("Falling back to " + mirrors[0])
+				log.Info("Falling back to " + mirrors[0])
 				// remove mirror we are using from list
 				for i, m := range mirrors {
 					if m == mirrors[0] {
@@ -188,14 +189,14 @@ func main() {
 		err = downloadMapset(set.SetID, name, mirror)
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
-			logerror(fmt.Sprint("Error downloading mapset:", err))
+			log.Error(fmt.Sprint("Error downloading mapset:", err))
 			if mirrorFallback {
 				// if no other mirrors, exit
 				if len(mirrors) == 0 {
-					logerror("All mirrors tried, exiting..")
+					log.Error("All mirrors tried, exiting..")
 					os.Exit(1)
 				}
-				info("Falling back to " + mirrors[0])
+				log.Info("Falling back to " + mirrors[0])
 				mirror = getMirror(mirrors[0], mirrorOpts)
 				// remove mirror we are using from list
 				for i, m := range mirrors {
@@ -218,7 +219,7 @@ func downloadMapset(mapsetID int, name string, mirror mapsetMirror) error {
 		return err
 	}
 
-	info("Downloading " + name)
+	log.Info("Downloading " + name)
 
 	// write body to file
 	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, name))

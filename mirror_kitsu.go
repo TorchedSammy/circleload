@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/TorchedSammy/circleload/log"
 )
 
 type kitsuMirror struct {
@@ -124,7 +126,7 @@ func (k kitsuMirror) GetMapsetData(id int) (*http.Response, error) {
 	// kitsu doesnt have a noVideo option
 	// log that it doesnt
 	if k.opts.noVideo {
-		warn("kitsu mirror doesnt support noVideo")
+		log.Warn("kitsu mirror doesnt support noVideo")
 	}
 
 	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/d/%d", id))
