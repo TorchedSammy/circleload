@@ -1,4 +1,4 @@
-package main
+package mirror
 
 import (
 	"encoding/json"
@@ -6,14 +6,14 @@ import (
 	"net/http"
 )
 
-type chimuMirror struct{
-	opts mirrorOptions
+type Chimu struct {
+	Options Options
 }
 
 type chimuResponse struct {
 	Code int
 	Message string
-	Data osuMapset
+	Data Mapset
 }
 
 type chimuMap struct {
@@ -29,17 +29,17 @@ type chimuMapResponse struct {
 
 type chimuSearchResponse struct {
 	chimuResponse
-	Data []osuMapset
+	Data []Mapset
 }
 
-func (k chimuMirror) GetMapset(id int) (osuMapset, error) {
+func (c Chimu) GetMapset(id int) (Mapset, error) {
 	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/set/%d", id))
 	if err != nil {
-		return osuMapset{}, err
+		return Mapset{}, err
 	}
 
 	if resp.StatusCode == 404 {
-		return osuMapset{}, ErrMapsetNotFound
+		return Mapset{}, ErrMapsetNotFound
 	}
 
 	var apiResp chimuResponse
@@ -49,25 +49,25 @@ func (k chimuMirror) GetMapset(id int) (osuMapset, error) {
 	return set, nil
 }
 
-func (k chimuMirror) GetMapsetFromMap(id int) (osuMapset, error) {
+func (c Chimu) GetMapsetFromMap(id int) (Mapset, error) {
 	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/map/%d", id))
 	if err != nil {
-		return osuMapset{}, err
+		return Mapset{}, err
 	}
 
 	if resp.StatusCode == 404 {
-		return osuMapset{}, ErrMapsetNotFound
+		return Mapset{}, ErrMapsetNotFound
 	}
 
 	var apiResp chimuMapResponse
 	json.NewDecoder(resp.Body).Decode(&apiResp)
 	beatmap := apiResp.Data
 
-	return k.GetMapset(beatmap.SetID)
+	return c.GetMapset(beatmap.SetID)
 }
 
-func (k chimuMirror) Search(query string) ([]osuMapset, error) {
-	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/search?query=%s&amount=%d", query, k.opts.maxResults))
+func (c Chimu) Search(query string) ([]Mapset, error) {
+	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/search?query=%s&amount=%d", query, c.Options.MaxResults))
 	if err != nil {
 		return nil, err
 	}
@@ -79,9 +79,9 @@ func (k chimuMirror) Search(query string) ([]osuMapset, error) {
 	return sets, nil
 }
 
-func (k chimuMirror) GetMapsetData(id int) (*http.Response, error) {
+func (c Chimu) GetMapsetData(id int) (*http.Response, error) {
 	noVideo := 0
-	if k.opts.noVideo {
+	if c.Options.NoVideo {
 		noVideo = 1
 	}
 

@@ -11,6 +11,7 @@ import (
 
 	flag "github.com/spf13/pflag"
 	"github.com/TorchedSammy/circleload/log"
+	"github.com/TorchedSammy/circleload/mirror"
 	"github.com/manifoldco/promptui"
 	"github.com/cheggaaa/pb"
 )
@@ -26,13 +27,6 @@ var (
 )
 
 const version = "0.2.0"
-
-type osuMapset struct {
-	SetID   int
-	Artist string
-	Title string
-	Mapper string `json:"Creator"`
-}
 
 func main() {
 	homedir, _ := os.UserHomeDir()
@@ -70,9 +64,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	mirrorOpts := mirrorOptions{
-		noVideo: noVideo,
-		maxResults: maxResults,
+	mirrorOpts := mirror.Options{
+		NoVideo: noVideo,
+		MaxResults: maxResults,
 	}
 	mirror := getMirror(mirrorName, mirrorOpts)
 
@@ -92,7 +86,7 @@ func main() {
 
 	for _, v := range flag.Args() {
 	start:
-		var set osuMapset
+		var set mirror.Mapset
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
 			// will assume its a url
@@ -213,7 +207,7 @@ func main() {
 	}
 }
 
-func downloadMapset(mapsetID int, name string, mirror mapsetMirror) error {
+func downloadMapset(mapsetID int, name string, mirror mirror.Mirror) error {
 	mapsetResp, err := mirror.GetMapsetData(mapsetID)
 	if err != nil {
 		return err
@@ -244,12 +238,12 @@ func downloadMapset(mapsetID int, name string, mirror mapsetMirror) error {
 	return nil
 }
 
-func getMirror(name string, opts mirrorOptions) mapsetMirror {
+func getMirror(name string, opts mirror.Options) mirror.Mirror {
 	switch name {
 	case "kitsu":
-		return kitsuMirror{opts: opts}
+		return mirror.Kitsu{opts}
 	case "chimu":
-		return chimuMirror{opts: opts}
+		return mirror.Chimu{opts}
 	// perhaps in the future, copilot
 	/*
 	case "osu":
