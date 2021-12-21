@@ -22,6 +22,17 @@ type kitsuResponse struct {
 	Message string
 }
 
+type kitsuMap struct {
+	BeatmapID int
+	ParentSetID int
+}
+
+type kitsuMapResponse struct {
+	kitsuMap
+	Code int
+	Message string
+}
+
 func (k kitsuMirror) GetMapset(id int) (osuMapset, error) {
 	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/api/s/%d", id))
 	if err != nil {
@@ -53,6 +64,38 @@ func (k kitsuMirror) GetMapset(id int) (osuMapset, error) {
 	}
 
 	return set, nil
+}
+
+func (k kitsuMirror) GetMapsetFromMap(id int) (osuMapset, error) {
+	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/api/b/%d", id))
+	if err != nil {
+		return osuMapset{}, err
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return osuMapset{}, err
+	}
+
+	var apiResp kitsuMapResponse
+	err = json.Unmarshal(body, &apiResp)
+	if err != nil {
+		return osuMapset{}, err
+	}
+
+	if apiResp.Code != 0 {
+		switch apiResp.Code {
+		case 404:
+			return osuMapset{}, ErrBeatmapNotFound
+		}
+	}
+
+	beatmap, err := k.GetMapset(apiResp.ParentSetID)
+	if err != nil {
+		return osuMapset{}, err
+	}
+
+	return k.GetMapset(beatmap.SetID)
 }
 
 // thanks copilot
