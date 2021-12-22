@@ -53,8 +53,7 @@ func main() {
 
 	if len(flag.Args()) == 0 {
 		fmt.Println("Usage: Circeload [flags] <mapset> [mapset] ...")
-		//not implemented
-		//fmt.Println("mapset can be the url or just the id")
+		fmt.Println("mapset can be the url or just the id")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
