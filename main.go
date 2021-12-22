@@ -178,7 +178,7 @@ func main() {
 			}
 		}
 	download:
-		name := strings.Replace(fmt.Sprintf("%d %s - %s", set.SetID, set.Artist, set.Title), "/", "", -1)
+		name := fmt.Sprintf("%d %s - %s", set.SetID, set.Artist, set.Title)
 		err = downloadMapset(set.SetID, name, dlmirror)
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
@@ -214,8 +214,15 @@ func downloadMapset(mapsetID int, name string, mirror mirror.Mirror) error {
 
 	log.Info("Downloading " + name)
 
+	// fName is the name without illegal characters
+	fName := name
+	illegalChars := []string{"\\", "/", ":", "*", "?", "\"", "<", ">", "|"}
+	for _, c := range illegalChars {
+		fName = strings.Replace(fName, c, "_", -1)
+	}
+
 	// write body to file
-	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, name))
+	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, fName))
 	if err != nil {
 		return err
 	}
