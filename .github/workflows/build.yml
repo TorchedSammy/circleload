@@ -6,8 +6,8 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.build }}
-    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.goos }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         goos: [linux, windows, darwin]
@@ -27,7 +27,7 @@ jobs:
         with:
           go-version: '1.16.2'
       - name: Build
-        run: go build
+        run: GOARCH=${{ matrix.goarch }} go build
       - uses: actions/upload-artifact@v2
         with:
           name: circleload-${{ matrix.goos }}-${{ matrix.goarch }}
