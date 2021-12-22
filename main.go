@@ -127,7 +127,7 @@ func main() {
 			}
 
 			escapedSearch := url.PathEscape(v)
-			log.Info("Searching for query", v)
+			log.Info("Searching for query ", v)
 			sets, _ := dlmirror.Search(escapedSearch)
 			if len(sets) == 0 {
 				log.Error("No results found.")
