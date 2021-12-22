@@ -68,9 +68,9 @@ func main() {
 		NoVideo: noVideo,
 		MaxResults: maxResults,
 	}
-	mirror := getMirror(mirrorName, mirrorOpts)
+	dlmirror := getMirror(mirrorName, mirrorOpts)
 
-	if mirror == nil {
+	if dlmirror == nil {
 		fmt.Println("Invalid mirror", mirrorName)
 		fmt.Println("Valid mirrors are:", strings.Join(mirrors, ", "))
 		os.Exit(1)
@@ -103,7 +103,7 @@ func main() {
 							log.Error("Ignoring invalid mapset url: " + v)
 						}
 
-						set, err = mirror.GetMapset(idInt)
+						set, err = dlmirror.GetMapset(idInt)
 						goto download
 					} else if strings.HasPrefix(u.Path, "/beatmaps/") {
 						idInt, err = strconv.Atoi(u.Path[len("/beatmaps/"):])
@@ -111,7 +111,7 @@ func main() {
 							log.Error("Ignoring invalid mapset url: " + v)
 						}
 
-						mapset, err := mirror.GetMapsetFromMap(idInt)
+						mapset, err := dlmirror.GetMapsetFromMap(idInt)
 						if err != nil {
 							log.Error(fmt.Sprintln("Could not get mapset from map:", err))
 						}
@@ -128,8 +128,8 @@ func main() {
 			}
 
 			escapedSearch := url.PathEscape(v)
-			log.Info(fmt.Sprintf("Searching for query \"%s\"", v))
-			sets, _ := mirror.Search(escapedSearch)
+			log.Info("Searching for query", v)
+			sets, _ := dlmirror.Search(escapedSearch)
 			if len(sets) == 0 {
 				log.Error("No results found.")
 				continue
@@ -155,7 +155,7 @@ func main() {
 			goto download
 		}
 
-		set, err = mirror.GetMapset(idInt)
+		set, err = dlmirror.GetMapset(idInt)
 		if err != nil {
 			fmt.Println("Error getting mapset:", err)
 			if mirrorFallback {
@@ -164,7 +164,7 @@ func main() {
 					fmt.Println("All mirrors tried, exiting..")
 					os.Exit(1)
 				}
-				mirror = getMirror(mirrors[0], mirrorOpts)
+				dlmirror = getMirror(mirrors[0], mirrorOpts)
 				log.Info("Falling back to " + mirrors[0])
 				// remove mirror we are using from list
 				for i, m := range mirrors {
@@ -180,7 +180,7 @@ func main() {
 		}
 	download:
 		name := strings.Replace(fmt.Sprintf("%d %s - %s", set.SetID, set.Artist, set.Title), "/", "", -1)
-		err = downloadMapset(set.SetID, name, mirror)
+		err = downloadMapset(set.SetID, name, dlmirror)
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
 			log.Error(fmt.Sprint("Error downloading mapset:", err))
@@ -191,7 +191,7 @@ func main() {
 					os.Exit(1)
 				}
 				log.Info("Falling back to " + mirrors[0])
-				mirror = getMirror(mirrors[0], mirrorOpts)
+				dlmirror = getMirror(mirrors[0], mirrorOpts)
 				// remove mirror we are using from list
 				for i, m := range mirrors {
 					if m == mirrors[0] {
