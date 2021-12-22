@@ -100,7 +100,6 @@ func (k Kitsu) GetMapsetFromMap(id int) (Mapset, error) {
 	return k.GetMapset(beatmap.SetID)
 }
 
-// thanks copilot
 func (k Kitsu) Search(query string) ([]Mapset, error) {
 	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/api/search?query=%s&amount=%d", query, k.Options.MaxResults))
 	if err != nil {
@@ -121,7 +120,6 @@ func (k Kitsu) Search(query string) ([]Mapset, error) {
 	return sets, nil
 }
 
-// get beatmap from kitsu
 func (k Kitsu) GetMapsetData(id int) (*http.Response, error) {
 	// kitsu doesnt have a noVideo option
 	// log that it doesnt
