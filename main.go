@@ -241,9 +241,9 @@ func downloadMapset(mapsetID int, name string, mirror mirror.Mirror) error {
 func getMirror(name string, opts mirror.Options) mirror.Mirror {
 	switch name {
 	case "kitsu":
-		return mirror.Kitsu{opts}
+		return mirror.Kitsu{Options: opts}
 	case "chimu":
-		return mirror.Chimu{opts}
+		return mirror.Chimu{Options: opts}
 	// perhaps in the future, copilot
 	/*
 	case "osu":
