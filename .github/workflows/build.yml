@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.goos }}
+    name: ${{ matrix.goos }}-${{ matrix.goarch }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
