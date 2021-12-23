@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 type Chimu struct {
@@ -67,7 +68,16 @@ func (c Chimu) GetMapsetFromMap(id int) (Mapset, error) {
 }
 
 func (c Chimu) Search(query string) ([]Mapset, error) {
-	resp, err := http.Get(fmt.Sprintf("https://api.chimu.moe/v1/search?query=%s&amount=%d", query, c.Options.MaxResults))
+	reqUrl, _ := url.Parse(fmt.Sprintf("https://api.chimu.moe/v1/search?query=%s&amount=%d", query, c.Options.MaxResults))
+	// all gamemodes, golang ""enums"" am i right
+	// basically we should only add the mode query if we dont want all gamemodes
+	if c.Options.Mode != AnyMode {
+		q := reqUrl.Query()
+		q.Add("mode", fmt.Sprintf("%d", c.Options.Mode))
+		reqUrl.RawQuery = q.Encode()
+	}
+
+	resp, err := http.Get(reqUrl.String())
 	if err != nil {
 		return nil, err
 	}
@@ -95,4 +105,8 @@ func (c Chimu) GetMapsetData(id int) (*http.Response, error) {
 	}
 
 	return resp, nil
+}
+
+func (c *Chimu) SetMode(mode Gamemode) {
+	c.Options.Mode = mode
 }

@@ -6,14 +6,15 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
-	flag "github.com/spf13/pflag"
+	"github.com/TorchedSammy/circleload/beatmap"
 	"github.com/TorchedSammy/circleload/log"
-	"github.com/TorchedSammy/circleload/mirror"
-	"github.com/manifoldco/promptui"
 	"github.com/cheggaaa/pb"
+	"github.com/manifoldco/promptui"
+	flag "github.com/spf13/pflag"
 )
 
 var (
@@ -27,6 +28,7 @@ var (
 )
 
 const version = "0.2.0"
+var kvRegex = regexp.MustCompile(`([\w]+)=([\w]+)`)
 
 func main() {
 	homedir, _ := os.UserHomeDir()
@@ -63,9 +65,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	mirrorOpts := mirror.Options{
+	mirrorOpts := beatmap.Options{
 		NoVideo: noVideo,
 		MaxResults: maxResults,
+		Mode: beatmap.AnyMode,
 	}
 	dlmirror := getMirror(mirrorName, mirrorOpts)
 
@@ -85,9 +88,42 @@ func main() {
 
 	for _, v := range flag.Args() {
 	start:
-		var set mirror.Mapset
+		var set beatmap.Mapset
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
+			mirrorOpts.Mode = beatmap.AnyMode
+			// match all key value pairs in search query
+			matches := kvRegex.FindAllStringSubmatch(v, -1)
+			if len(matches) > 0 {
+				for _, m := range matches {
+					// expected format: [group, key, value]
+					if len(m) == 3 {
+						// check key
+						switch m[1] {
+							case "mode": // specific gamemode
+							modes := []beatmap.Gamemode{beatmap.Standard, beatmap.Taiko, beatmap.Catch, beatmap.Mania}
+
+							for i, mode := range modes {
+								m := strings.ToLower(m[2])
+								if m == "osu" {
+									dlmirror.SetMode(beatmap.Standard)
+								} else if m == strings.ToLower(mode.String()) {
+									dlmirror.SetMode(mode)
+									break
+								} else if i == len(modes) - 1 {
+									log.Warn("Unknown gamemode ", m, ", getting maps for any gamemode.")
+								}		
+							}
+
+							v = strings.Replace(v, m[0], "", -1)
+						}
+					}
+				}
+			}
+
+			// strip spaces
+			v = strings.TrimSpace(v)
+
 			// will assume its a url
 			// try to parse it
 			u, err := url.ParseRequestURI(v)
@@ -206,7 +242,7 @@ func main() {
 	}
 }
 
-func downloadMapset(mapsetID int, name string, mirror mirror.Mirror) error {
+func downloadMapset(mapsetID int, name string, mirror beatmap.Mirror) error {
 	mapsetResp, err := mirror.GetMapsetData(mapsetID)
 	if err != nil {
 		return err
@@ -244,12 +280,12 @@ func downloadMapset(mapsetID int, name string, mirror mirror.Mirror) error {
 	return nil
 }
 
-func getMirror(name string, opts mirror.Options) mirror.Mirror {
+func getMirror(name string, opts beatmap.Options) beatmap.Mirror {
 	switch name {
 	case "kitsu":
-		return mirror.Kitsu{Options: opts}
+		return &beatmap.Kitsu{Options: opts}
 	case "chimu":
-		return mirror.Chimu{Options: opts}
+		return &beatmap.Chimu{Options: opts}
 	// perhaps in the future, copilot
 	/*
 	case "osu":

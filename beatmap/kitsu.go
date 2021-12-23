@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/TorchedSammy/circleload/log"
 )
@@ -101,7 +102,16 @@ func (k Kitsu) GetMapsetFromMap(id int) (Mapset, error) {
 }
 
 func (k Kitsu) Search(query string) ([]Mapset, error) {
-	resp, err := http.Get(fmt.Sprintf("https://kitsu.moe/api/search?query=%s&amount=%d", query, k.Options.MaxResults))
+	reqUrl, _ := url.Parse(fmt.Sprintf("https://kitsu.moe/api/search?query=%s&amount=%d", query, k.Options.MaxResults))
+	// all gamemodes, golang ""enums"" am i right
+	// basically we should only add the mode query if we dont want all gamemodes
+	if k.Options.Mode != AnyMode {
+		q := reqUrl.Query()
+		q.Add("mode", fmt.Sprintf("%d", k.Options.Mode))
+		reqUrl.RawQuery = q.Encode()
+	}
+
+	resp, err := http.Get(reqUrl.String())
 	if err != nil {
 		return nil, err
 	}
@@ -139,3 +149,6 @@ func (k Kitsu) GetMapsetData(id int) (*http.Response, error) {
 	return resp, nil
 }
 
+func (k *Kitsu) SetMode(mode Gamemode) {
+	k.Options.Mode = mode
+}
