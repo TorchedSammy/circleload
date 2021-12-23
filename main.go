@@ -68,7 +68,7 @@ func main() {
 	mirrorOpts := beatmap.Options{
 		NoVideo: noVideo,
 		MaxResults: maxResults,
-		Mode: beatmap.AnyMode,
+		Mode: beatmap.ModeAny,
 	}
 	dlmirror := getMirror(mirrorName, mirrorOpts)
 
@@ -91,7 +91,7 @@ func main() {
 		var set beatmap.Mapset
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
-			mirrorOpts.Mode = beatmap.AnyMode
+			mirrorOpts.Mode = beatmap.ModeAny
 			// match all key value pairs in search query
 			matches := kvRegex.FindAllStringSubmatch(v, -1)
 			if len(matches) > 0 {
@@ -101,12 +101,12 @@ func main() {
 						// check key
 						switch m[1] {
 							case "mode": // specific gamemode
-							modes := []beatmap.Gamemode{beatmap.Standard, beatmap.Taiko, beatmap.Catch, beatmap.Mania}
+							modes := []beatmap.Mode{beatmap.ModeStandard, beatmap.ModeTaiko, beatmap.ModeCatch, beatmap.ModeMania}
 
 							for i, mode := range modes {
 								m := strings.ToLower(m[2])
 								if m == "osu" {
-									dlmirror.SetMode(beatmap.Standard)
+									dlmirror.SetMode(beatmap.ModeStandard)
 								} else if m == strings.ToLower(mode.String()) {
 									dlmirror.SetMode(mode)
 									break

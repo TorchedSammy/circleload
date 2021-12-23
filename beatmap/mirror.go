@@ -15,12 +15,12 @@ type Mirror interface {
 	GetMapsetFromMap(id int) (Mapset, error)
 	Search(query string) ([]Mapset, error)
 	GetMapsetData(id int) (*http.Response, error)
-	SetMode(mode Gamemode)
+	SetMode(mode Mode)
 }
 
 type Options struct {
 	NoVideo bool
 	MaxResults int
-	Mode Gamemode
+	Mode Mode
 }
 

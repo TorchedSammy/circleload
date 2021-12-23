@@ -1,25 +1,25 @@
 package beatmap
 
-type Gamemode int
+type Mode int
 const (
-	Standard Gamemode = iota
-	Taiko
-	Catch
-	Mania
-	AnyMode Gamemode = 727 // :)
+	ModeStandard Mode = iota
+	ModeTaiko
+	ModeCatch
+	ModeMania
+	ModeAny Mode = 727 // :)
 )
 
-func (g Gamemode) String() string {
+func (g Mode) String() string {
 	switch g {
-	case Standard:
+	case ModeStandard:
 		return "Standard"
-	case Taiko:
+	case ModeTaiko:
 		return "Taiko"
-	case Catch:
+	case ModeCatch:
 		return "Catch"
-	case Mania:
+	case ModeMania:
 		return "Mania"
-	case AnyMode:
+	case ModeAny:
 		return "Any"
 	default:
 		return ""

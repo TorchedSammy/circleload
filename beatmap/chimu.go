@@ -71,7 +71,7 @@ func (c Chimu) Search(query string) ([]Mapset, error) {
 	reqUrl, _ := url.Parse(fmt.Sprintf("https://api.chimu.moe/v1/search?query=%s&amount=%d", query, c.Options.MaxResults))
 	// all gamemodes, golang ""enums"" am i right
 	// basically we should only add the mode query if we dont want all gamemodes
-	if c.Options.Mode != AnyMode {
+	if c.Options.Mode != ModeAny {
 		q := reqUrl.Query()
 		q.Add("mode", fmt.Sprintf("%d", c.Options.Mode))
 		reqUrl.RawQuery = q.Encode()
@@ -107,6 +107,6 @@ func (c Chimu) GetMapsetData(id int) (*http.Response, error) {
 	return resp, nil
 }
 
-func (c *Chimu) SetMode(mode Gamemode) {
+func (c *Chimu) SetMode(mode Mode) {
 	c.Options.Mode = mode
 }

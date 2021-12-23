@@ -105,7 +105,7 @@ func (k Kitsu) Search(query string) ([]Mapset, error) {
 	reqUrl, _ := url.Parse(fmt.Sprintf("https://kitsu.moe/api/search?query=%s&amount=%d", query, k.Options.MaxResults))
 	// all gamemodes, golang ""enums"" am i right
 	// basically we should only add the mode query if we dont want all gamemodes
-	if k.Options.Mode != AnyMode {
+	if k.Options.Mode != ModeAny {
 		q := reqUrl.Query()
 		q.Add("mode", fmt.Sprintf("%d", k.Options.Mode))
 		reqUrl.RawQuery = q.Encode()
@@ -149,6 +149,6 @@ func (k Kitsu) GetMapsetData(id int) (*http.Response, error) {
 	return resp, nil
 }
 
-func (k *Kitsu) SetMode(mode Gamemode) {
+func (k *Kitsu) SetMode(mode Mode) {
 	k.Options.Mode = mode
 }
