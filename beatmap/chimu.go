@@ -1,4 +1,4 @@
-package mirror
+package beatmap
 
 import (
 	"encoding/json"

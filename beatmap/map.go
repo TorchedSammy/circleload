@@ -1,4 +1,4 @@
-package mirror
+package beatmap
 
 type Mapset struct {
 	SetID   int

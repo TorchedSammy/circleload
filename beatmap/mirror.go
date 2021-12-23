@@ -1,4 +1,4 @@
-package mirror
+package beatmap
 
 import (
 	"errors"
@@ -20,5 +20,6 @@ type Mirror interface {
 type Options struct {
 	NoVideo bool
 	MaxResults int
+	Mode Gamemode
 }
 

@@ -1,4 +1,4 @@
-package mirror
+package beatmap
 
 // This defines the kitsu.moe mirror.
 import (
