@@ -104,10 +104,10 @@ func main() {
 							modes := []beatmap.Mode{beatmap.ModeStandard, beatmap.ModeTaiko, beatmap.ModeCatch, beatmap.ModeMania}
 
 							for i, mode := range modes {
-								m := strings.ToLower(m[2])
+								m := m[2]
 								if m == "osu" {
 									dlmirror.SetMode(beatmap.ModeStandard)
-								} else if m == strings.ToLower(mode.String()) {
+								} else if m == mode.String() {
 									dlmirror.SetMode(mode)
 									break
 								} else if i == len(modes) - 1 {
