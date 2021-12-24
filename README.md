@@ -1,8 +1,9 @@
 # Circleload
 > 📩 Command line osu! beatmap downloader
 
-Circleload is a command line tool to easily download osu! beatmaps.  
-It is a work in progress! There are some things that aren't handled properly.
+Circleload is a versatile CLI to easily download osu! beatmaps.
+It supports filtering by gamemode and ranked status, different mirrors and
+multiple downloads.
 
 https://user-images.githubusercontent.com/38820196/142741654-67cc917a-ef51-4032-882a-463c5a14df6f.mp4
 
@@ -24,11 +25,17 @@ go build
 ```
 
 ## Usage
-Run the binary to see usage. A simple example would be
-```
-Circleload 1077483 -d .
-```  
-The `-d` option changes the directory to download to (in this case making it our current directory.)
+Basic usage is very simple. Circleload can take 3 types of arguments:
+- A search query: `./circleload "1,000,000 times"`
+- Beatmap (set) URL: `./circleload https://osu.ppy.sh/beatmapsets/1588063`
+- Beatmap set ID: `./circleload 1588063`  
+It can also take a variable amount of these, for mass download use.
+
+## Filters
+For a search query, Circleload supports providing filters.
+Supported filters:
+- `mode`: Beatmap gamemode. Accepts `osu`, `standard`, `taiko`, `mania`, and `catch`
+- `status`: Ranked status. Accepts `ranked`, `loved`, `graveyard`, `pending`, `approved`, `qualified` and `wip`
 
 # License
 MIT
