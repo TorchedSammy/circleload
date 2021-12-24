@@ -12,15 +12,15 @@ const (
 func (m Mode) String() string {
 	switch m {
 	case ModeStandard:
-		return "Standard"
+		return "standard"
 	case ModeTaiko:
-		return "Taiko"
+		return "taiko"
 	case ModeCatch:
-		return "Catch"
+		return "catch"
 	case ModeMania:
-		return "Mania"
+		return "mania"
 	case ModeAny:
-		return "Any"
+		return "any"
 	default:
 		return ""
 	}
