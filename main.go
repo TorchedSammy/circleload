@@ -98,25 +98,24 @@ func main() {
 				for _, m := range matches {
 					// expected format: [group, key, value]
 					if len(m) == 3 {
+						group, key, val := m[0], m[1], m[2]
 						// check key
-						switch m[1] {
+						switch key {
 							case "mode": // specific gamemode
 							modes := []beatmap.Mode{beatmap.ModeStandard, beatmap.ModeTaiko, beatmap.ModeCatch, beatmap.ModeMania}
 
 							for i, mode := range modes {
-								m := m[2]
-								if m == "osu" {
+								if val == "osu" {
 									dlmirror.SetMode(beatmap.ModeStandard)
-								} else if m == mode.String() {
+								} else if val == mode.String() {
 									dlmirror.SetMode(mode)
 									break
 								} else if i == len(modes) - 1 {
-									log.Warn("Unknown gamemode ", m, ", getting maps for any gamemode.")
+									log.Warn("Unknown gamemode ", val, ", getting maps for any gamemode.")
 								}		
 							}
-
-							v = strings.Replace(v, m[0], "", -1)
 						}
+						v = strings.Replace(v, group, "", -1)
 					}
 				}
 			}
