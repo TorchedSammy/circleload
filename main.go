@@ -128,7 +128,7 @@ func main() {
 									} else if i == len(statuses) - 1 {
 										log.Warn("Unknown status ", val, ", getting maps for any status.")
 									}
-								}	
+								}
 						}
 						v = strings.Replace(v, group, "", -1)
 					}
