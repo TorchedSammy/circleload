@@ -274,7 +274,10 @@ func downloadMapset(mapsetID int, name string, mirror beatmap.Mirror) error {
 
 	bar.Start()
 	// mapset is a ReadCloser
-	io.Copy(file, barWriter)
+	_, err = io.Copy(file, barWriter)
+	if err != nil {
+		return err
+	}
 	mapsetResp.Body.Close()
 	bar.Finish()
 
