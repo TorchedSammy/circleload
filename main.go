@@ -68,7 +68,6 @@ func main() {
 	mirrorOpts := beatmap.Options{
 		NoVideo: noVideo,
 		MaxResults: maxResults,
-		Mode: beatmap.ModeStandard,
 	}
 	dlmirror := getMirror(mirrorName, mirrorOpts)
 
@@ -92,6 +91,7 @@ func main() {
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
 			dlmirror.SetMode(beatmap.ModeStandard)
+			dlmirror.SetStatus(beatmap.StatusRanked)
 			// match all key value pairs in search query
 			matches := kvRegex.FindAllStringSubmatch(v, -1)
 			if len(matches) > 0 {
@@ -114,6 +114,21 @@ func main() {
 									log.Warn("Unknown gamemode ", val, ", getting maps for any gamemode.")
 								}		
 							}
+							case "status": // mapset status
+								statuses := []beatmap.Status{
+									beatmap.StatusGraveyard, beatmap.StatusWIP, beatmap.StatusPending,
+									beatmap.StatusRanked, beatmap.StatusApproved, beatmap.StatusQualified,
+									beatmap.StatusLoved,
+								}
+
+								for i, status := range statuses {
+									if val == status.String() {
+										dlmirror.SetStatus(status)
+										break
+									} else if i == len(statuses) - 1 {
+										log.Warn("Unknown status ", val, ", getting maps for any status.")
+									}
+								}	
 						}
 						v = strings.Replace(v, group, "", -1)
 					}

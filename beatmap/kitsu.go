@@ -110,6 +110,11 @@ func (k Kitsu) Search(query string) ([]Mapset, error) {
 		q.Add("mode", fmt.Sprintf("%d", k.Options.Mode))
 		reqUrl.RawQuery = q.Encode()
 	}
+	if k.Options.Status != StatusAny {
+		q := reqUrl.Query()
+		q.Add("status", fmt.Sprintf("%d", k.Options.Status))
+		reqUrl.RawQuery = q.Encode()
+	}
 
 	resp, err := http.Get(reqUrl.String())
 	if err != nil {
@@ -152,3 +157,8 @@ func (k Kitsu) GetMapsetData(id int) (*http.Response, error) {
 func (k *Kitsu) SetMode(mode Mode) {
 	k.Options.Mode = mode
 }
+
+func (k *Kitsu) SetStatus(status Status) {
+	k.Options.Status = status
+}
+

@@ -76,6 +76,11 @@ func (c Chimu) Search(query string) ([]Mapset, error) {
 		q.Add("mode", fmt.Sprintf("%d", c.Options.Mode))
 		reqUrl.RawQuery = q.Encode()
 	}
+	if c.Options.Status != StatusAny {
+		q := reqUrl.Query()
+		q.Add("status", fmt.Sprintf("%d", c.Options.Status))
+		reqUrl.RawQuery = q.Encode()
+	}
 
 	resp, err := http.Get(reqUrl.String())
 	if err != nil {
@@ -109,4 +114,8 @@ func (c Chimu) GetMapsetData(id int) (*http.Response, error) {
 
 func (c *Chimu) SetMode(mode Mode) {
 	c.Options.Mode = mode
+}
+
+func (c *Chimu) SetStatus(status Status) {
+	c.Options.Status = status
 }
