@@ -9,8 +9,8 @@ const (
 	ModeAny Mode = 727 // :)
 )
 
-func (g Mode) String() string {
-	switch g {
+func (m Mode) String() string {
+	switch m {
 	case ModeStandard:
 		return "Standard"
 	case ModeTaiko:

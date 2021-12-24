@@ -258,7 +258,8 @@ func downloadMapset(mapsetID int, name string, mirror beatmap.Mirror) error {
 	}
 
 	// write body to file
-	file, err := os.Create(fmt.Sprintf("%s/%s.osz", outDir, fName))
+	dest := filepath.Join(outDir, fName + ".cdl")
+	file, err := os.Create(dest)
 	if err != nil {
 		return err
 	}
@@ -276,6 +277,9 @@ func downloadMapset(mapsetID int, name string, mirror beatmap.Mirror) error {
 	io.Copy(file, barWriter)
 	mapsetResp.Body.Close()
 	bar.Finish()
+
+	// remove cdl extension and add .osz
+	os.Rename(dest, dest[:len(dest)-4] + ".osz")
 
 	return nil
 }
