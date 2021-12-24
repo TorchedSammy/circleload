@@ -68,7 +68,7 @@ func main() {
 	mirrorOpts := beatmap.Options{
 		NoVideo: noVideo,
 		MaxResults: maxResults,
-		Mode: beatmap.ModeAny,
+		Mode: beatmap.ModeStandard,
 	}
 	dlmirror := getMirror(mirrorName, mirrorOpts)
 
@@ -91,7 +91,7 @@ func main() {
 		var set beatmap.Mapset
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
-			mirrorOpts.Mode = beatmap.ModeAny
+			dlmirror.SetMode(beatmap.ModeStandard)
 			// match all key value pairs in search query
 			matches := kvRegex.FindAllStringSubmatch(v, -1)
 			if len(matches) > 0 {
