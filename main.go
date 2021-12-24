@@ -111,7 +111,7 @@ func main() {
 									dlmirror.SetMode(mode)
 									break
 								} else if i == len(modes) - 1 {
-									log.Warn("Unknown gamemode ", val, ", getting maps for any gamemode.")
+									log.Warn("Unknown gamemode ", val, ", filtering by ", mirrorOpts.Mode.String(), " instead.")
 								}		
 							}
 							case "status": // mapset status
@@ -126,7 +126,7 @@ func main() {
 										dlmirror.SetStatus(status)
 										break
 									} else if i == len(statuses) - 1 {
-										log.Warn("Unknown status ", val, ", getting maps for any status.")
+										log.Warn("Unknown status ", val, ", filtering by ", mirrorOpts.Status.String(), " maps instead.")
 									}
 								}
 						}
