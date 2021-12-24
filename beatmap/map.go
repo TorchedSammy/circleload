@@ -5,6 +5,6 @@ type Mapset struct {
 	Artist string
 	Title string
 	Mapper string `json:"Creator"`
+	Status int `json:"RankedStatus"`
 }
-
 
