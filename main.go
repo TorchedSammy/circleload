@@ -27,7 +27,7 @@ var (
 	maxResults int
 )
 
-const version = "0.3.0"
+const version = "0.3.1"
 var kvRegex = regexp.MustCompile(`([\w]+)=([\w]+)`)
 
 func main() {
