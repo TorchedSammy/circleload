@@ -68,6 +68,8 @@ func main() {
 	mirrorOpts := beatmap.Options{
 		NoVideo: noVideo,
 		MaxResults: maxResults,
+		Mode: beatmap.ModeStandard,
+		Status: beatmap.StatusRanked,
 	}
 	dlmirror := getMirror(mirrorName, mirrorOpts)
 
