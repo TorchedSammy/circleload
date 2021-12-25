@@ -211,11 +211,11 @@ func main() {
 
 		set, err = dlmirror.GetMapset(idInt)
 		if err != nil {
-			fmt.Println("Error getting mapset:", err)
+			log.Error("Error getting mapset:", err)
 			if mirrorFallback {
 				// if no other mirrors, exit
 				if len(mirrors) == 0 {
-					fmt.Println("All mirrors tried, exiting..")
+					log.Error("All mirrors tried, exiting..")
 					os.Exit(1)
 				}
 				dlmirror = getMirror(mirrors[0], mirrorOpts)
