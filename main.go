@@ -146,23 +146,28 @@ func main() {
 				if u.Host == "osu.ppy.sh" {
 					// we accept the path "beatmapsets/<id>" and "beatmaps/<id>"
 					// a beatmapset has just a mapset, where for beatmaps we need to get the mapset id
+					id := strings.Split(strings.Split(u.Path, "/")[2], "#")[0]
+					idInt, err = strconv.Atoi(id)
 					if strings.HasPrefix(u.Path, "/beatmapsets/") {
-						idInt, err = strconv.Atoi(u.Path[len("/beatmapsets/"):])
+						// err from above
 						if err != nil {
 							log.Error("Ignoring invalid mapset url: " + v)
+							continue
 						}
 
 						set, err = dlmirror.GetMapset(idInt)
 						goto download
 					} else if strings.HasPrefix(u.Path, "/beatmaps/") {
-						idInt, err = strconv.Atoi(u.Path[len("/beatmaps/"):])
+						// err from above
 						if err != nil {
 							log.Error("Ignoring invalid mapset url: " + v)
+							continue
 						}
 
 						mapset, err := dlmirror.GetMapsetFromMap(idInt)
 						if err != nil {
 							log.Error(fmt.Sprintln("Could not get mapset from map:", err))
+							continue
 						}
 						set = mapset
 						goto download
