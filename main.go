@@ -104,7 +104,7 @@ func main() {
 						// check key
 						switch key {
 							case "mode": // specific gamemode
-							modes := []beatmap.Mode{beatmap.ModeStandard, beatmap.ModeTaiko, beatmap.ModeCatch, beatmap.ModeMania}
+							modes := []beatmap.Mode{beatmap.ModeStandard, beatmap.ModeTaiko, beatmap.ModeCatch, beatmap.ModeMania, beatmap.ModeAny}
 
 							for i, mode := range modes {
 								if val == "osu" {
@@ -120,7 +120,7 @@ func main() {
 								statuses := []beatmap.Status{
 									beatmap.StatusGraveyard, beatmap.StatusWIP, beatmap.StatusPending,
 									beatmap.StatusRanked, beatmap.StatusApproved, beatmap.StatusQualified,
-									beatmap.StatusLoved,
+									beatmap.StatusLoved, beatmap.StatusAny,
 								}
 
 								for i, status := range statuses {
