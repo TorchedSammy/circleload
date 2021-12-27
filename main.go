@@ -150,7 +150,7 @@ func main() {
 					// a beatmapset has just a mapset, where for beatmaps we need to get the mapset id
 					id := strings.Split(strings.Split(u.Path, "/")[2], "#")[0]
 					idInt, err = strconv.Atoi(id)
-					if strings.HasPrefix(u.Path, "/beatmapsets/") || strings.HasPrefix(u.Path, "/b/") {
+					if strings.HasPrefix(u.Path, "/beatmapsets/") || strings.HasPrefix(u.Path, "/s/") {
 						// err from above
 						if err != nil {
 							log.Error("Ignoring invalid mapset url: " + v)
@@ -159,7 +159,7 @@ func main() {
 
 						set, err = dlmirror.GetMapset(idInt)
 						goto download
-					} else if strings.HasPrefix(u.Path, "/beatmaps/") {
+					} else if strings.HasPrefix(u.Path, "/beatmaps/") || strings.HasPrefix(u.Path, "/b/") {
 						// err from above
 						if err != nil {
 							log.Error("Ignoring invalid mapset url: " + v)
