@@ -174,11 +174,11 @@ func main() {
 						set = mapset
 						goto download
 					} else {
-						log.Error("Invalid mapset url")
-						os.Exit(1)
+						log.Error("Invalid mapset url ", v)
+						continue
 					}
 				} else {
-					log.Error("Ignoring non-osu url: " + v)
+					log.Error("Ignoring non-osu url: ", v)
 					continue
 				}
 			}
