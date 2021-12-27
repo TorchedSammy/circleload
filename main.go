@@ -213,7 +213,7 @@ func main() {
 
 		set, err = dlmirror.GetMapset(idInt)
 		if err != nil {
-			log.Error("Error getting mapset:", err)
+			log.Error("Error getting mapset: ", err)
 			if mirrorFallback {
 				// if no other mirrors, exit
 				if len(mirrors) == 0 {
@@ -239,7 +239,7 @@ func main() {
 		err = downloadMapset(set.SetID, name, dlmirror)
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
-			log.Error(fmt.Sprint("Error downloading mapset:", err))
+			log.Error("Error downloading mapset: ", err)
 			if mirrorFallback {
 				// if no other mirrors, exit
 				if len(mirrors) == 0 {
