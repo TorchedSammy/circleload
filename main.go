@@ -192,8 +192,8 @@ func main() {
 			}
 			setTiles := make([]string, len(sets))
 			for i, s := range sets {
-				// title - artist by mapper
-				setTiles[i] = fmt.Sprintf("%s - %s by %s", s.Title, s.Artist, s.Mapper)
+				// artist - title by mapper
+				setTiles[i] = fmt.Sprintf("%s - %s by %s", s.Artist, s.Title, s.Mapper)
 			}
 
 			prompt := promptui.Select{
