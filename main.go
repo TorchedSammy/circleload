@@ -17,6 +17,8 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
+const version = "0.3.1"
+
 var (
 	outDir string
 	mirrorName string
@@ -27,8 +29,10 @@ var (
 	maxResults int
 )
 
-const version = "0.3.1"
 var kvRegex = regexp.MustCompile(`([\w]+)=([\w]+)`)
+var	mirrors = []string{"kitsu", "chimu"}
+var dlmirror beatmap.Mirror
+var mirrorOpts beatmap.Options
 
 func main() {
 	homedir, _ := os.UserHomeDir()
@@ -47,7 +51,6 @@ func main() {
 		return
 	}
 
-	mirrors := []string{"kitsu", "chimu"}
 	if mirrorListFlag {
 		fmt.Println("Available mirrors:", strings.Join(mirrors, ", "))
 		return
@@ -65,13 +68,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	mirrorOpts := beatmap.Options{
+	mirrorOpts = beatmap.Options{
 		NoVideo: noVideo,
 		MaxResults: maxResults,
 		Mode: beatmap.ModeStandard,
 		Status: beatmap.StatusRanked,
 	}
-	dlmirror := getMirror(mirrorName, mirrorOpts)
+	dlmirror = getMirror(mirrorName, mirrorOpts)
 
 	if dlmirror == nil {
 		fmt.Println("Invalid mirror", mirrorName)
@@ -79,13 +82,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// remove mirror we are using from list
-	for i, m := range mirrors {
-		if m == mirrorName {
-			mirrors = append(mirrors[:i], mirrors[i + 1:]...)
-			break
-		}
-	}
+	cycleMirrors()
 
 	for _, v := range flag.Args() {
 	start:
@@ -208,32 +205,18 @@ func main() {
 			}
 
 			set = sets[idx]
-			goto download
-		}
-
-		set, err = dlmirror.GetMapset(idInt)
-		if err != nil {
-			log.Error("Error getting mapset: ", err)
-			if mirrorFallback {
-				// if no other mirrors, exit
-				if len(mirrors) == 0 {
-					log.Error("All mirrors tried, exiting..")
-					os.Exit(1)
+		} else {
+			set, err = dlmirror.GetMapset(idInt)
+			if err != nil {
+				log.Error("Error getting mapset: ", err)
+				if mirrorFallback {
+					fallbackMirror()
+					goto start
 				}
-				dlmirror = getMirror(mirrors[0], mirrorOpts)
-				log.Info("Falling back to " + mirrors[0])
-				// remove mirror we are using from list
-				for i, m := range mirrors {
-					if m == mirrors[0] {
-						mirrors = append(mirrors[:i], mirrors[i + 1:]...)
-						break
-					}
-				}
-				goto start
-			} else {
 				continue
 			}
 		}
+
 	download:
 		name := fmt.Sprintf("%d %s - %s", set.SetID, set.Artist, set.Title)
 		err = downloadMapset(set.SetID, name, dlmirror)
@@ -241,24 +224,10 @@ func main() {
 			// i dont really like the repeating code here but i dont know how to do it better
 			log.Error("Error downloading mapset: ", err)
 			if mirrorFallback {
-				// if no other mirrors, exit
-				if len(mirrors) == 0 {
-					log.Error("All mirrors tried, exiting..")
-					os.Exit(1)
-				}
-				log.Info("Falling back to " + mirrors[0])
-				dlmirror = getMirror(mirrors[0], mirrorOpts)
-				// remove mirror we are using from list
-				for i, m := range mirrors {
-					if m == mirrors[0] {
-						mirrors = append(mirrors[:i], mirrors[i + 1:]...)
-						break
-					}
-				}
+				fallbackMirror()
 				goto start
-			} else {
-				continue
 			}
+			continue
 		}
 	}
 }
@@ -303,7 +272,7 @@ func downloadMapset(mapsetID int, name string, mirror beatmap.Mirror) error {
 	bar.Finish()
 
 	// remove cdl extension and add .osz
-	os.Rename(dest, dest[:len(dest)-4] + ".osz")
+	os.Rename(dest, dest[:len(dest) - 4] + ".osz")
 
 	return nil
 }
@@ -324,3 +293,21 @@ func getMirror(name string, opts beatmap.Options) beatmap.Mirror {
 	return nil
 }
 
+func fallbackMirror() {
+	if len(mirrors) == 0 {
+		log.Error("All mirrors tried, exiting..")
+		os.Exit(1)
+	}
+	dlmirror = getMirror(mirrors[0], mirrorOpts)
+	log.Info("Falling back to " + mirrors[0])
+	cycleMirrors()
+}
+
+func cycleMirrors() {
+	for i, m := range mirrors {
+		if m == mirrors[0] {
+			mirrors = append(mirrors[:i], mirrors[i + 1:]...)
+			break
+		}
+	}
+}
