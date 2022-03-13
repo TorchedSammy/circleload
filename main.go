@@ -146,6 +146,8 @@ func main() {
 			r, err := searchBeatmaps(v)
 			if err == errNoResults {
 				log.Error("No results found.")
+				fallbackMirror()
+				goto start
 			} else if err == errSearchAborted {
 				log.Error("Search aborted.")
 				continue
