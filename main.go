@@ -13,7 +13,6 @@ import (
 	"github.com/TorchedSammy/circleload/beatmap"
 	"github.com/TorchedSammy/circleload/log"
 	"github.com/cheggaaa/pb"
-	"github.com/manifoldco/promptui"
 	flag "github.com/spf13/pflag"
 )
 
@@ -91,49 +90,13 @@ func main() {
 		if err != nil {
 			dlmirror.SetMode(beatmap.ModeStandard)
 			dlmirror.SetStatus(beatmap.StatusRanked)
-			// match all key value pairs in search query
 			matches := kvRegex.FindAllStringSubmatch(v, -1)
 			if len(matches) > 0 {
-				for _, m := range matches {
-					// expected format: [group, key, value]
-					if len(m) == 3 {
-						group, key, val := m[0], m[1], m[2]
-						// check key
-						switch key {
-							case "mode": // specific gamemode
-							modes := []beatmap.Mode{beatmap.ModeStandard, beatmap.ModeTaiko, beatmap.ModeCatch, beatmap.ModeMania, beatmap.ModeAny}
-
-							for i, mode := range modes {
-								if val == "osu" {
-									dlmirror.SetMode(beatmap.ModeStandard)
-								} else if val == mode.String() {
-									dlmirror.SetMode(mode)
-									break
-								} else if i == len(modes) - 1 {
-									log.Warn("Unknown gamemode ", val, ", filtering by ", mirrorOpts.Mode.String(), " instead.")
-								}		
-							}
-							case "status": // mapset status
-								statuses := []beatmap.Status{
-									beatmap.StatusGraveyard, beatmap.StatusWIP, beatmap.StatusPending,
-									beatmap.StatusRanked, beatmap.StatusApproved, beatmap.StatusQualified,
-									beatmap.StatusLoved, beatmap.StatusAny,
-								}
-
-								for i, status := range statuses {
-									if val == status.String() {
-										dlmirror.SetStatus(status)
-										break
-									} else if i == len(statuses) - 1 {
-										log.Warn("Unknown status ", val, ", filtering by ", mirrorOpts.Status.String(), " maps instead.")
-									}
-								}
-						}
-						v = strings.Replace(v, group, "", -1)
-					}
-				}
+				// apply filters and remove them from search query
+				v = applyFilters(matches, v)
 			}
 
+			// match all key value pairs in search query
 			// strip spaces
 			v = strings.TrimSpace(v)
 
@@ -180,31 +143,18 @@ func main() {
 				}
 			}
 
-			escapedSearch := url.PathEscape(v)
-			log.Info("Searching for query ", v)
-			sets, _ := dlmirror.Search(escapedSearch)
-			if len(sets) == 0 {
+			r, err := searchBeatmaps(v)
+			if err == errNoResults {
 				log.Error("No results found.")
+			} else if err == errSearchAborted {
+				log.Error("Search aborted.")
 				continue
-			}
-			setTiles := make([]string, len(sets))
-			for i, s := range sets {
-				// artist - title by mapper
-				setTiles[i] = fmt.Sprintf("%s - %s by %s", s.Artist, s.Title, s.Mapper)
-			}
-
-			prompt := promptui.Select{
-				Label: "Select a mapset",
-				Items: setTiles,
-			}
-
-			idx, _, err := prompt.Run()
-			if err != nil {
-				fmt.Println("Aborting search...")
+			} else if err != nil {
+				log.Error("Error searching for ", v, ": ", err)
 				continue
 			}
 
-			set = sets[idx]
+			set = r
 		} else {
 			set, err = dlmirror.GetMapset(idInt)
 			if err != nil {
