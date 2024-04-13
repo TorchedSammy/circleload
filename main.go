@@ -31,7 +31,7 @@ var (
 )
 
 var kvRegex = regexp.MustCompile(`([\w]+)=([\w]+)`)
-var mirrors = []string{"chimu", "osudirect"}
+var mirrors = []string{"chimu", "osudirect", "nerinyan"}
 var dlmirror mirror.Mirror
 var mirrorOpts mirror.Options
 
@@ -241,6 +241,8 @@ func getMirror(name string, opts mirror.Options) mirror.Mirror {
 		return &mirror.Chimu{Options: opts}
 	case "osudirect":
 		return &mirror.OsuDirect{Options: opts}
+	case "nerinyan":
+		return &mirror.Nerinyan{Options: opts}
 	// perhaps in the future, copilot
 	/*
 	case "osu":
