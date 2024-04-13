@@ -106,9 +106,7 @@ func (c OsuDirect) Search(query string, options Options) ([]beatmap.Mapset, erro
 }
 
 func (c OsuDirect) GetMapsetData(id int, options Options) (*http.Response, error) {
-	url := fmt.Sprintf("%s/d/%d", baseUrl, id)
-	fmt.Println(url)
-	resp, err := http.Get(url)
+	resp, err := http.Get(fmt.Sprintf("%s/d/%d", baseUrl, id))
 	if err != nil {
 		return nil, err
 	}
