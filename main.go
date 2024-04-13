@@ -31,14 +31,14 @@ var (
 )
 
 var kvRegex = regexp.MustCompile(`([\w]+)=([\w]+)`)
-var mirrors = []string{"chimu"}
+var mirrors = []string{"chimu", "osudirect"}
 var dlmirror mirror.Mirror
 var mirrorOpts mirror.Options
 
 func main() {
 	homedir, _ := os.UserHomeDir()
 	flag.StringVarP(&outDir, "downloadDir", "d", filepath.Join(homedir, "Downloads"), "Directory Circeload will download maps into")
-	flag.StringVarP(&mirrorName, "mirror", "m", "chimu", "Mirror to download from (kitsu or chimu)")
+	flag.StringVarP(&mirrorName, "mirror", "m", "chimu", fmt.Sprintf("Mirror to download from (Options: %s)", strings.Join(mirrors, ", ")))
 	flag.BoolVarP(&mirrorFallback, "fallback", "f", true, "Fallback to other mirrors if main mirror fails")
 	flag.BoolVarP(&noVideo, "no-video", "n", false, "Download mapset without video")
 	flag.BoolVarP(&versionFlag, "version", "v", false, "Print version and exit")
@@ -237,10 +237,10 @@ func downloadMapset(mapsetID int, name string, mirror mirror.Mirror, options mir
 
 func getMirror(name string, opts mirror.Options) mirror.Mirror {
 	switch name {
-//	case "kitsu":
-//		return &mirror.Kitsu{Options: opts}
 	case "chimu":
 		return &mirror.Chimu{Options: opts}
+	case "osudirect":
+		return &mirror.OsuDirect{Options: opts}
 	// perhaps in the future, copilot
 	/*
 	case "osu":

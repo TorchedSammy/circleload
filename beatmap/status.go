@@ -34,3 +34,26 @@ func (s Status) String() string {
 		return "unknown"
 	}
 }
+
+func StatusFromString(status string) Status {
+	switch status {
+	case "graveyard":
+		return StatusGraveyard
+	case "wip":
+		return StatusWIP
+	case "pending":
+		return StatusPending
+	case "ranked":
+		return StatusRanked
+	case "approved":
+		return StatusApproved
+	case "qualified":
+		return StatusQualified
+	case "loved":
+		return StatusLoved
+	case "any":
+		return StatusAny
+	default:
+		return StatusAny
+	}
+}
