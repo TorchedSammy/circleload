@@ -27,9 +27,17 @@ func applyFilters(matches [][]string, query string) string {
 
 				for i, mode := range modes {
 					if val == "osu" {
-						dlmirror.SetMode(beatmap.ModeStandard)
+						mirrorOptions := dlmirror.MirrorOptions()
+						mirrorOptions.Mode = beatmap.ModeStandard
+
+						dlmirror.SetOptions(mirrorOptions)
+						//dlmirror.SetMode(beatmap.ModeStandard)
 					} else if val == mode.String() {
-						dlmirror.SetMode(mode)
+						mirrorOptions := dlmirror.MirrorOptions()
+						mirrorOptions.Mode = mode
+
+						dlmirror.SetOptions(mirrorOptions)
+						//dlmirror.SetMode(mode)
 						break
 					} else if i == len(modes) - 1 {
 						log.Warn("Unknown gamemode ", val, ", filtering by ", mirrorOpts.Mode.String(), " instead.")
@@ -44,7 +52,10 @@ func applyFilters(matches [][]string, query string) string {
 
 					for i, status := range statuses {
 						if val == status.String() {
-							dlmirror.SetStatus(status)
+							mirrorOptions := dlmirror.MirrorOptions()
+							mirrorOptions.Status = status
+
+							dlmirror.SetOptions(mirrorOptions)
 							break
 						} else if i == len(statuses) - 1 {
 							log.Warn("Unknown status ", val, ", filtering by ", mirrorOpts.Status.String(), " maps instead.")
@@ -62,7 +73,7 @@ func searchBeatmaps(query string) (beatmap.Mapset, error) {
 	escapedSearch := url.PathEscape(query)
 
 	log.Info("Searching for query ", query)
-	sets, _ := dlmirror.Search(escapedSearch)
+	sets, _ := dlmirror.Search(escapedSearch, dlmirror.MirrorOptions())
 	if len(sets) == 0 {
 		return beatmap.Mapset{}, errNoResults
 	}

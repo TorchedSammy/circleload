@@ -10,13 +10,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/TorchedSammy/circleload/beatmap"
+	"github.com/TorchedSammy/circleload/mirror"
 	"github.com/TorchedSammy/circleload/log"
+	"github.com/TorchedSammy/circleload/beatmap"
+
 	"github.com/cheggaaa/pb"
 	flag "github.com/spf13/pflag"
 )
 
-const version = "0.3.1"
+const version = "0.4.0"
 
 var (
 	outDir string
@@ -29,9 +31,9 @@ var (
 )
 
 var kvRegex = regexp.MustCompile(`([\w]+)=([\w]+)`)
-var	mirrors = []string{"kitsu", "chimu"}
-var dlmirror beatmap.Mirror
-var mirrorOpts beatmap.Options
+var mirrors = []string{"chimu"}
+var dlmirror mirror.Mirror
+var mirrorOpts mirror.Options
 
 func main() {
 	homedir, _ := os.UserHomeDir()
@@ -67,7 +69,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	mirrorOpts = beatmap.Options{
+	mirrorOpts = mirror.Options{
 		NoVideo: noVideo,
 		MaxResults: maxResults,
 		Mode: beatmap.ModeStandard,
@@ -88,8 +90,8 @@ func main() {
 		var set beatmap.Mapset
 		idInt, err := strconv.Atoi(v)
 		if err != nil {
-			dlmirror.SetMode(beatmap.ModeStandard)
-			dlmirror.SetStatus(beatmap.StatusRanked)
+			//dlmirror.SetMode(beatmap.ModeStandard)
+			//dlmirror.SetStatus(beatmap.StatusRanked)
 			matches := kvRegex.FindAllStringSubmatch(v, -1)
 			if len(matches) > 0 {
 				// apply filters and remove them from search query
@@ -175,7 +177,7 @@ func main() {
 
 	download:
 		name := fmt.Sprintf("%d %s - %s", set.SetID, set.Artist, set.Title)
-		err = downloadMapset(set.SetID, name, dlmirror)
+		err = downloadMapset(set.SetID, name, dlmirror, mirrorOpts)
 		if err != nil {
 			// i dont really like the repeating code here but i dont know how to do it better
 			log.Error("Error downloading mapset: ", err)
@@ -188,8 +190,8 @@ func main() {
 	}
 }
 
-func downloadMapset(mapsetID int, name string, mirror beatmap.Mirror) error {
-	mapsetResp, err := mirror.GetMapsetData(mapsetID)
+func downloadMapset(mapsetID int, name string, mirror mirror.Mirror, options mirror.Options) error {
+	mapsetResp, err := mirror.GetMapsetData(mapsetID, options)
 	if err != nil {
 		return err
 	}
@@ -233,12 +235,12 @@ func downloadMapset(mapsetID int, name string, mirror beatmap.Mirror) error {
 	return nil
 }
 
-func getMirror(name string, opts beatmap.Options) beatmap.Mirror {
+func getMirror(name string, opts mirror.Options) mirror.Mirror {
 	switch name {
-	case "kitsu":
-		return &beatmap.Kitsu{Options: opts}
+//	case "kitsu":
+//		return &mirror.Kitsu{Options: opts}
 	case "chimu":
-		return &beatmap.Chimu{Options: opts}
+		return &mirror.Chimu{Options: opts}
 	// perhaps in the future, copilot
 	/*
 	case "osu":
